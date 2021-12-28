@@ -1,0 +1,4 @@
+train: ../laboro_small/images/train
+test: ../laboro_small/images/test
+nc: 3
+names: ['fully_ripened', 'semi_ripened', 'green']

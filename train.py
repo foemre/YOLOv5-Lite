@@ -97,7 +97,7 @@ def train(hyp, opt, device, tb_writer=None):
     with torch_distributed_zero_first(rank):
         check_dataset(data_dict)  # check
     train_path = data_dict['train']
-    test_path = data_dict['val']
+    test_path = data_dict['test']
 
     # Freeze
     freeze = []  # parameter names to freeze (full or partial)
@@ -589,7 +589,7 @@ if __name__ == '__main__':
                 x = np.loadtxt('evolve.txt', ndmin=2)
                 n = min(5, len(x))  # number of previous results to consider
                 x = x[np.argsort(-fitness(x))][:n]  # top n mutations
-                w = fitness(x) - fitness(x).min()  # weights
+                w = fitness(x) - fitness(x).min() + 1E-6  # weights
                 if parent == 'single' or len(x) == 1:
                     # x = x[random.randint(0, n - 1)]  # random selection
                     x = x[random.choices(range(n), weights=w)[0]]  # weighted selection

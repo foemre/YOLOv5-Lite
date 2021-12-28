@@ -1,0 +1,4 @@
+train: ../laboro_tomato6/images/train
+test: ../laboro_tomato6/images/test
+nc: 6
+names: ['l_fully_ripened', 'l_semi_ripened', 'l_green','s_fully_ripened', 's_semi_ripened', 's_green']
