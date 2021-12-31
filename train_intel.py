@@ -253,7 +253,7 @@ def train(hyp, opt, device, tb_writer=None):
                 f'Logging results to {save_dir}\n'
                 f'Starting training for {epochs} epochs...')
     for epoch in range(start_epoch, epochs):  # epoch ------------------------------------------------------------------
-        with torch.cpu.amp.autocast():
+        with amp.autocast(enabled=cuda):
             model.train()
 
             # Update image weights (optional)
