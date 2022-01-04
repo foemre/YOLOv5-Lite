@@ -121,11 +121,11 @@ def main():
         destination_test_img = os.path.join(dirname, "images", "test")
         files_list = os.listdir(source_train_img)
         for item in files_list:
-            shutil.copy(os.path.join(source_train_img, item), destination_train_img)
+            shutil.move(os.path.join(source_train_img, item), destination_train_img)
         print("Train imgs copied")
         files_list = os.listdir(source_test_img)
         for item in files_list:
-            shutil.copy(os.path.join(source_test_img, item), destination_test_img)
+            shutil.move(os.path.join(source_test_img, item), destination_test_img)
         print("Test imgs copied")
 
         source_train_labels = os.path.join(dirname, "labels", "train")
@@ -136,22 +136,22 @@ def main():
         files_list = os.listdir(destination_train_img)
         for item in val_files:
             if os.path.exists(os.path.join(destination_train_img, item + ".jpg")):
-                shutil.copy(os.path.join(destination_train_img, item + ".jpg"), destination_val_img)
+                shutil.move(os.path.join(destination_train_img, item + ".jpg"), destination_val_img)
         print("Val imgtrain copied")
         files_list = os.listdir(destination_test_img)
         for item in val_files:
             if os.path.exists(os.path.join(destination_test_img, item + ".jpg")):
-                shutil.copy(os.path.join(destination_test_img, item + ".jpg"), destination_val_img)
+                shutil.move(os.path.join(destination_test_img, item + ".jpg"), destination_val_img)
         print("Val imgtest copied")
         files_list = os.listdir(source_train_labels)
         for item in val_files:
             if os.path.exists(os.path.join(source_train_labels, item + ".txt")):
-                shutil.copy(os.path.join(source_train_labels, item + ".txt"), destination_val_labels)
+                shutil.move(os.path.join(source_train_labels, item + ".txt"), destination_val_labels)
         print("Val trainlabels copied")
         files_list = os.listdir(source_test_labels)
         for item in val_files:
             if os.path.exists(os.path.join(source_test_labels, item + ".txt")):
-                shutil.copy(os.path.join(source_test_labels, item + ".txt"), destination_val_labels)
+                shutil.move(os.path.join(source_test_labels, item + ".txt"), destination_val_labels)
         print("Val testlabels copied")
             
 
