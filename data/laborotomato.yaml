@@ -1,4 +1,5 @@
 train: ../laboro_tomato/images/train
+val: ../laboro_tomato/images/val
 test: ../laboro_tomato/images/test
 nc: 3
 names: ['fully_ripened', 'semi_ripened', 'green']
