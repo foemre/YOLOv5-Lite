@@ -1,0 +1,5 @@
+train: ../disease/images/train
+val: ../disease/images/val
+test: ../disease/images/test
+nc: 7
+names: ['Bacterial_spot', 'healthy', 'Late_blight', 'Leaf_Mold', 'mosaic_virus', 'Two-spotted_spider_mite', 'Yellow_Leaf_Curl_Virus']
