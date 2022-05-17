@@ -45,9 +45,12 @@ def main():
 
     #Do 25 loops over background images
     valcount = 0
+    vallimit = 16
     testcount = 0
+    testlimit = 16
     count = 0
-    while len(images) > 0:
+    countlimit = 80
+    while len(images) > 0 and count < countlimit:
         #For each background image
         for path in backgrounds:
             background = cv2.imread(path)
@@ -122,11 +125,11 @@ def main():
                 # thickness = 3
                 # background = cv2.rectangle(background, start_point, end_point, color, thickness)
 
-                if valcount < 160:
+                if valcount < vallimit:
                     with open(os.path.join(dst_val_txt, str(count) + '.txt'), 'a') as f:
                         line_to_write = " ".join([str(imgclass), str(norm_x), str(norm_y), str(norm_w), str(norm_h)])
                         f.write(line_to_write + "\n")
-                elif valcount >= 160 and testcount < 160:
+                elif valcount >= vallimit and testcount < testlimit:
                     with open(os.path.join(dst_test_txt, str(count) + '.txt'), 'a') as f:
                         line_to_write = " ".join([str(imgclass), str(norm_x), str(norm_y), str(norm_w), str(norm_h)])
                         f.write(line_to_write + "\n")
@@ -134,11 +137,11 @@ def main():
                     with open(os.path.join(dst_train_txt, str(count) + '.txt'), 'a') as f:
                         line_to_write = " ".join([str(imgclass), str(norm_x), str(norm_y), str(norm_w), str(norm_h)])
                         f.write(line_to_write + "\n")
-            if valcount < 160:
+            if valcount < vallimit:
                 path_to_write = os.path.join(dst_val_img, str(count) + '.jpg')
                 cv2.imwrite(path_to_write, background)
                 valcount += 1
-            elif valcount >= 160 and testcount < 160:
+            elif valcount >= vallimit and testcount < testlimit:
                 path_to_write = os.path.join(dst_test_img, str(count) + '.jpg')
                 cv2.imwrite(path_to_write, background)
                 testcount += 1
