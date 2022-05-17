@@ -70,18 +70,12 @@ def main():
                 scale_ratio = random.random() + 1
                 imgwidth = int(image.shape[1] * scale_ratio)
                 imgheight = int(image.shape[0] * scale_ratio)
-                image = cv2.resize(image,(imgwidth,imgheight))
+                image = cv2.resize(image,(imgwidth,imgheight), interpolation = cv2.INTER_LANCZOS4)
 
                 imgclass = os.path.split(imgpath)[0]
                 imgname = os.path.split(imgpath)[1]
-                rows,cols,_ = image.shape
                 #b_rows = random.randint(0, background.shape[0] - 256)
                 #b_cols = random.randint(0, background.shape[1] - 256)
-                b_row = random.choice(b_rows)
-                b_rows.remove(b_row)
-                b_col = random.choice(b_cols)
-                b_cols.remove(b_col)
-                roi = background[b_row:b_row + rows, b_col:b_col + cols]
                 
                 # mask = np.zeros(image.shape[:2],np.uint8)
                 # bgdModel = np.zeros((1,65),np.float64)
@@ -91,13 +85,44 @@ def main():
                 # mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
                 # image = image*mask2[:,:,np.newaxis]
 
+                kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
+                smallkernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2,2))
                 imggray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
                 ret, mask = cv2.threshold(imggray, 5, 255, cv2.THRESH_BINARY)
-                imggray = cv2.GaussianBlur(imggray,(3,3),0)
+                mask = cv2.GaussianBlur(mask,(3,3),0)
+                
+                mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
+                mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
+                ret, mask = cv2.threshold(imggray, 5, 255, cv2.THRESH_BINARY)
+                mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
+                mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
+                mask = cv2.erode(mask, kernel, iterations=3)
+                mask = cv2.erode(mask, smallkernel, iterations=3)
+
+                contours,hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                cnt = max(contours, key = cv2.contourArea)
+                bndx,bndy,bndw,bndh = cv2.boundingRect(cnt)
+                image = image[bndy:bndy+bndh,bndx:bndx+bndw]
+                mask = mask[bndy:bndy+bndh,bndx:bndx+bndw]
+                #cv2.imwrite('mask' + str(count) + '.jpg',mask)
+                #cv2.imwrite('image' + str(count) + '.jpg',image)
                 mask_inv = cv2.bitwise_not(mask)
-                kernel = np.ones((3,3))
-                #mask_inv = cv2.erode(mask_inv, kernel)
-                mask_inv = cv2.dilate(mask_inv, kernel)
+                #contours,hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                
+                # print(image.shape)
+                # image = cv2.drawContours(image, contours, -1, (0,255,0), 3)
+                # image = cv2.rectangle(image, (bndx+1,bndy+1), (bndx+bndw-1,bndy+bndh-1), (0,0,255), 2)
+                #get contour
+                #get min rect
+                #crop original image to minrect
+                #proceed
+                rows,cols,_ = image.shape
+                b_row = random.choice(b_rows)
+                b_rows.remove(b_row)
+                b_col = random.choice(b_cols)
+                b_cols.remove(b_col)
+                roi = background[b_row:b_row + rows, b_col:b_col + cols]
+
                 background_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
                 img_fg = cv2.bitwise_and(image,image, mask = mask)
                 dst = cv2.add(background_bg, img_fg)
@@ -105,6 +130,7 @@ def main():
                 w = image.shape[1]
                 h = image.shape[0]
 
+                #background = cv2.rectangle(background, (b_col,b_row), (b_col + cols, b_row + rows), (0,0,255), 2)
                 #TODO:
                 #Add minimum mask rect
                 center_x = b_col + w/2
