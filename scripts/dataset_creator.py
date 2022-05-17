@@ -45,11 +45,11 @@ def main():
 
     #Do 25 loops over background images
     valcount = 0
-    vallimit = 80
+    vallimit = 180
     testcount = 0
-    testlimit = 80
+    testlimit = 180
     count = 0
-    countlimit = 400
+    countlimit = 4999900
     while len(images) > 0 and count < countlimit:
         #For each background image
         for path in backgrounds:
