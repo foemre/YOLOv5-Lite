@@ -42,15 +42,53 @@ def main():
         for file in os.listdir(folder):
             images.append(os.path.join(folder, file))
 
+    for path in backgrounds:
+        background = cv2.imread(path)
+        background_bw = cv2.cvtColor(background, cv2.COLOR_BGR2GRAY)
+        background_blur = cv2.GaussianBlur(background,(5,5),0)
+        background_bw_blur = cv2.GaussianBlur(background_bw,(5,5),0)
+        cv2.imwrite(os.path.splitext(path)[0]+'.jpg', background, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+        cv2.imwrite(os.path.splitext(path)[0]+'_bw.jpg', background_bw, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+        cv2.imwrite(os.path.splitext(path)[0]+'_blur.jpg', background_blur, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+        cv2.imwrite(os.path.splitext(path)[0]+'_bw_blur.jpg', background_bw_blur, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+    print('Backgrounds done')
+    for imgpath in images:
+        image = cv2.imread(imgpath)
+        image_bw = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image_blur = cv2.GaussianBlur(image,(3,3),0)
+        image_bw_blur = cv2.GaussianBlur(image_bw,(3,3),0)
+        cv2.imwrite(os.path.splitext(imgpath)[0]+ '.jpg', image, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+        cv2.imwrite(os.path.splitext(imgpath)[0]+ '_bw.jpg', image_bw, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+        cv2.imwrite(os.path.splitext(imgpath)[0]+ '_blur.jpg', image_blur, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+        cv2.imwrite(os.path.splitext(imgpath)[0]+'_bw_blur.jpg', image_bw_blur, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+        for i, rot in enumerate([cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE]):
+            image = cv2.rotate(image, rot)
+            image_bw = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            image_blur = cv2.GaussianBlur(image,(3,3),0)
+            image_bw_blur = cv2.GaussianBlur(image_bw,(3,3),0)
+            cv2.imwrite(os.path.splitext(imgpath)[0]+'_' + str((i+1)*90) + '.jpg', image, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+            cv2.imwrite(os.path.splitext(imgpath)[0]+'_' + str((i+1)*90) + '_bw.jpg', image_bw, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+            cv2.imwrite(os.path.splitext(imgpath)[0]+'_' + str((i+1)*90) + '_blur.jpg', image_blur, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+            cv2.imwrite(os.path.splitext(imgpath)[0]+'_' + str((i+1)*90) + '_bw_blur.jpg', image_bw_blur, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+    print('Images done')
+    images = []
+    for folder in folders:
+        for file in os.listdir(folder):
+            images.append(os.path.join(folder, file))
+    
+    print(len(images))
 
+    backgrounds = [os.path.join(background_folder, item) for item in os.listdir(os.path.join(os.getcwd(), background_folder))]
     #Do 25 loops over background images
     valcount = 0
-    vallimit = 180
+    vallimit = 1280
     testcount = 0
-    testlimit = 180
+    testlimit = 1280
     count = 0
-    countlimit = 4999900
+    countlimit = 999999999
     while len(images) > 0 and count < countlimit:
+        if count % 100 == 0:
+            print("Processed %d images" % count)
         #For each background image
         for path in backgrounds:
             background = cv2.imread(path)
@@ -59,18 +97,16 @@ def main():
             
             #Limit number of images to place on background
             num_images = random.randint(5,11)
-            b_rows = np.linspace(0 + random.randint(0,127), background.shape[0]-512-random.randint(0,127), num=num_images, dtype=np.uint).tolist()
-            b_cols = np.linspace(0 + random.randint(0,127), background.shape[1]-512-random.randint(0,127), num=num_images, dtype=np.uint).tolist()
+            b_rows = np.linspace(0 + random.randint(0,127), background.shape[0]-448-random.randint(1,127), num=num_images, dtype=np.uint32).tolist()
+            b_cols = np.linspace(0 + random.randint(0,127), background.shape[1]-448-random.randint(1,127), num=num_images, dtype=np.uint32).tolist()
             
             for j in range(num_images):
                 imgpath = random.choice(images)
                 #print(imgpath)
                 images.remove(imgpath)
                 image = cv2.imread(imgpath)
-                scale_ratio = random.random() + 1
-                imgwidth = int(image.shape[1] * scale_ratio)
-                imgheight = int(image.shape[0] * scale_ratio)
-                image = cv2.resize(image,(imgwidth,imgheight), interpolation = cv2.INTER_LANCZOS4)
+                scale = random.random() + 0.75
+                image = cv2.resize(image, (int(image.shape[1]*scale), int(image.shape[0]*scale)), interpolation=cv2.INTER_AREA)
 
                 imgclass = os.path.split(imgpath)[0]
                 imgname = os.path.split(imgpath)[1]
@@ -121,7 +157,15 @@ def main():
                 b_rows.remove(b_row)
                 b_col = random.choice(b_cols)
                 b_cols.remove(b_col)
-                roi = background[b_row:b_row + rows, b_col:b_col + cols]
+                if (b_row + rows) > background.shape[0] or (b_col + cols) > background.shape[1]:
+                    print("Background shape error, auto shifting")
+                    diff = int(max((b_row + rows) - background.shape[0] + 3,(b_col + cols) - background.shape[1] + 3))
+                    print(diff)
+                    b_row = b_row - diff
+                    b_col = b_col - diff
+                    roi = background[b_row:b_row + rows, b_col:b_col + cols]
+                else:
+                    roi = background[b_row:b_row + rows, b_col:b_col + cols]        
 
                 background_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
                 img_fg = cv2.bitwise_and(image,image, mask = mask)
@@ -165,17 +209,18 @@ def main():
                         f.write(line_to_write + "\n")
             if valcount < vallimit:
                 path_to_write = os.path.join(dst_val_img, str(count) + '.jpg')
-                cv2.imwrite(path_to_write, background)
+                cv2.imwrite(path_to_write, background, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
                 valcount += 1
             elif valcount >= vallimit and testcount < testlimit:
                 path_to_write = os.path.join(dst_test_img, str(count) + '.jpg')
-                cv2.imwrite(path_to_write, background)
+                cv2.imwrite(path_to_write, background, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
                 testcount += 1
             else:
                 path_to_write = os.path.join(dst_train_img, str(count) + '.jpg')
-                cv2.imwrite(path_to_write, background)
+                cv2.imwrite(path_to_write, background, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
             count += 1
         if len(images) == 0:
             break
+    print('Finished')
 if __name__ == "__main__":
     main()
