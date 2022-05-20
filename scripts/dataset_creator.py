@@ -61,7 +61,7 @@ def main():
         cv2.imwrite(os.path.splitext(imgpath)[0]+ '_bw.jpg', image_bw, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
         cv2.imwrite(os.path.splitext(imgpath)[0]+ '_blur.jpg', image_blur, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
         cv2.imwrite(os.path.splitext(imgpath)[0]+'_bw_blur.jpg', image_bw_blur, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
-        for i, rot in enumerate([cv2.ROTATE_90_CLOCKWISE, cv2.ROTATE_180, cv2.ROTATE_90_COUNTERCLOCKWISE]):
+        for i, rot in enumerate([cv2.ROTATE_90_CLOCKWISE]):
             image = cv2.rotate(image, rot)
             image_bw = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             image_blur = cv2.GaussianBlur(image,(3,3),0)
