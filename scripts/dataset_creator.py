@@ -18,7 +18,7 @@ def make_dir(path):
             else: raise
 
 def main():
-    folders = ['Bacterial_spot', 'healthy', 'Late_blight', 'Leaf_Mold', 'mosaic_virus', 'Two-spotted_spider_mite', 'Yellow_Leaf_Curl_Virus']
+    folders = ['Bacterial_spot', 'healthy', 'Two-spotted_spider_mite', 'Yellow_Leaf_Curl_Virus']
     images = []
     background_folder = 'complex_background'
     filter_folder = 'filters'
@@ -228,7 +228,7 @@ def main():
             #filtering logic
             if random.random() < 0.5:
                 filter = random.choice(filters)
-                filter = cv2.imread(filter) * 1.5
+                filter = cv2.imread(filter) * 1.4
 
                 filter = cv2.resize(filter, (background.shape[1], background.shape[0]))
                 background = cv2.multiply(background/255, filter/255)*255
