@@ -29,7 +29,7 @@ hsv_s: 0.364
 hsv_v: 0.264
 degrees: 0.373
 translate: 0.245
-scale: 0.2
+scale: 0.5
 shear: 0.602
 perspective: 0.0
 flipud: 0.00856

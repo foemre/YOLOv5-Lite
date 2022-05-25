@@ -1,5 +1,5 @@
 train: ../disease/images/train
 val: ../disease/images/val
 test: ../disease/images/test
-nc: 5
-names: ['Bacterial_spot', 'healthy', 'Early_blight', 'Two-spotted_spider_mite', 'Yellow_Leaf_Curl_Virus']
+nc: 10
+names: ['Bacterial_spot', 'Early_blight', 'Healthy', 'Late_blight', 'Leaf_Mold', 'Mosaic_virus', 'Septoria_leaf_spot', 'Target_Spot', 'Two-spotted_spider_mite', 'Yellow_Leaf_Curl_Virus']
